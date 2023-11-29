@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <name>Connector</name>
+    <id>org.inkscape.effect.connector</id>
+    <effect>
+        <object-type>all</object-type>
+        <effects-menu>
+            <submenu name="Connector"/>
+        </effects-menu>
+    </effect>
+    <param name="stroke_width" type="float" min="0.1" max="1000" gui-text="Stroke width:">1</param>
+    <param name="text_size" type="float" min="0.1" max="1000" gui-text="Text size:">10</param>
+    <param name="scale_factor" type="float" min="0.1" max="10000" gui-text="Scale factor:">1</param>
+    <param name="text_raise" type="float" min="0" max="100" gui-text="Text raise distance:">5</param>
+    <script>
+        <command reldir="extensions" interpreter="python">connector.py</command>
+    </script>
+</inkscape-extension>
