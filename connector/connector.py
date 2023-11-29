@@ -83,7 +83,11 @@ class ConnectorExtension(inkex.EffectExtension):
             'style': f'stroke:black;stroke-width:{stroke_width_mm}mm;fill:none;marker-start:url(#Arrowhead);marker-end:url(#Arrowhead)'
         }
         line = inkex.PathElement(attrib=line_attribs)
-        self.svg.get_current_layer().append(line)
+
+        # Find or create 'Measurements' layer and add the line to it
+        measurements_layer = self.find_or_create_measurements_layer()
+        measurements_layer.append(line)
+
         bbox = self.calculate_bounding_box(start, end)
         length = self.get_longest_side_length(bbox) / 1000  # Convert to meters
         scaled_length = length * self.options.scale_factor  # Apply scale factor
@@ -110,7 +114,10 @@ class ConnectorExtension(inkex.EffectExtension):
         text_style = f'font-size:{text_size}px; text-anchor:middle'
         text.set('style', text_style)
         self.align_textbox(text, path_midpoint, angle, bbox, stroke_width)
-        self.svg.get_current_layer().append(text)
+
+        # Find or create 'Measurements' layer and add the text to it
+        measurements_layer = self.find_or_create_measurements_layer()
+        measurements_layer.append(text)
 
     def align_textbox(self, text_element, midpoint, angle, path_bbox, stroke_width):
         offset = self.options.text_raise
@@ -133,6 +140,20 @@ class ConnectorExtension(inkex.EffectExtension):
         text_element.set('x', str(final_x))
         text_element.set('y', str(final_y))
         text_element.set('transform', f'rotate({angle},{final_x},{final_y})')
+        
+    def find_or_create_measurements_layer(self):
+        # Look for a layer named 'Measurements'
+        svg_root = self.document.getroot()
+        ns = inkex.NSS['inkscape']
+        for layer in svg_root.findall('.//{http://www.w3.org/2000/svg}g'):
+            if layer.get(f'{{{ns}}}groupmode') == 'layer' and layer.get(f'{{{ns}}}label') == 'Measurements':
+                return layer
 
+        # If not found, create it
+        measurements_layer = inkex.Layer.new('Measurements')
+        measurements_layer.set(f'{{{ns}}}label', 'Measurements')
+        svg_root.append(measurements_layer)
+        return measurements_layer
+    
 if __name__ == '__main__':
     ConnectorExtension().run()
